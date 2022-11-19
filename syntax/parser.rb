@@ -16,14 +16,14 @@ class Parser
     token = nil
 
     until !token.nil? && token.kind == SyntaxKind::EOFToken
-      token = lexer.next_token
+      token = lexer.lex!
       break if token.nil?
 
       tokens << token unless token.kind == SyntaxKind::WhitespaceToken || token.kind == SyntaxKind::BadToken
     end
 
     # append last token IF it's good
-    next_tok = lexer.next_token
+    next_tok = lexer.lex!
     tokens << token unless next_tok.kind == SyntaxKind::WhitespaceToken || next_tok.kind == SyntaxKind::BadToken
 
     @tokens = Array(tokens)

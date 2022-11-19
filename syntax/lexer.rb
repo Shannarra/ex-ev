@@ -11,7 +11,7 @@ class Lexer
     @position = 0
   end
 
-  def next_token
+  def lex!
     return Token.new(SyntaxKind::EOFToken, @position, '\0', nil) if @position >= @text.length
 
     if current.numeric?
