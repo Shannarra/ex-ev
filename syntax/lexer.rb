@@ -74,7 +74,9 @@ class Lexer
     @text[@position]
   end
 
+  # rubocop:disable Naming/AccessorMethodName
   def get_next
     @position += 1
   end
+  # rubocop:enable Naming/AccessorMethodName
 end

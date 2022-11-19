@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 # coding: utf-8
 # frozen_string_literal: true
 
@@ -17,10 +16,10 @@ def pretty_print_tree(root, indent = '', is_last: true)
   puts ''
 
   indent += is_last ? '    ' : '│   '
-  last_child = root.get_children[-1]
+  last_child = root.children[-1]
 
   root.get_children do |child|
-    pretty_print_tree(child, indent, child == last_child)
+    pretty_print_tree(child, indent, is_last: child == last_child)
   end
 end
 

@@ -3,45 +3,44 @@
 class SyntaxNode
   attr_reader :kind
 
-  def get_children(); end
+  def initialize(kind, children)
+    @kind = kind
+    @children = Array(children)
+  end
+
+  def children(&block)
+    return @children.each(&block) if block_given?
+
+    @children
+  end
 end
 
-class ExpressionSyntax < SyntaxNode; end
+class ExpressionSyntax < SyntaxNode
+  def initialize(kind, children)
+    super(kind, children)
+    @children = children
+  end
+end
 
-class BinaryExpressionSyntax
-  attr_reader :kind, :left, :operator, :right
+class BinaryExpressionSyntax < ExpressionSyntax
+  attr_reader :left, :operator, :right
 
   def initialize(left, operator, right)
-    super()
-    @kind = SyntaxKind::BinaryExpression
+    super(SyntaxKind::BinaryExpression, [left, operator, right])
     @left = left
     @operator = operator
     @right = right
   end
-
-  def get_children
-    if block_given?
-      yield @left
-      yield @operator
-      yield @right
-    else
-      [@left, @operator, @right]
-    end
-  end
 end
 
 class Token < SyntaxNode
-  attr_reader :kind, :position, :text, :value
+  attr_reader :position, :text, :value
 
   def initialize(kind, position, text, value)
-    super()
-    @kind = kind
+    super(kind, []) # don't pass Token properties as children
+
     @position = position
     @text = text
     @value = value
-  end
-
-  def get_children
-    []
   end
 end

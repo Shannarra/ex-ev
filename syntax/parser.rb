@@ -75,6 +75,7 @@ class Parser
     Token.new(kind, current.position, nil, nil)
   end
 
+  # rubocop:disable Style/IdenticalConditionalBranches
   def parse_factor
     left = parse_primary_expr
 
@@ -93,6 +94,7 @@ class Parser
 
     left
   end
+  # rubocop:enable Style/IdenticalConditionalBranches
 
   def parse_primary_expr
     if current.kind == SyntaxKind::OpenParenthesisToken
@@ -111,15 +113,9 @@ class NumberExpressionSyntax < ExpressionSyntax
   attr_reader :kind, :token, :is_integer
 
   def initialize(token)
-    super()
+    super(kind, [])
     @token = token
     @is_integer = token.value.is_a? Integer
-  end
-
-  def get_children
-    yield @token if block_given?
-
-    [@token]
   end
 end
 
@@ -127,20 +123,9 @@ class ParenthesizedExpressionSyntax < ExpressionSyntax
   attr_reader :kind, :open_token, :expression, :closed_token
 
   def initialize(open_token, expression, closed_token)
-    super()
-    @kind = SyntaxKind::ParenthesizedExpression
+    super(SyntaxKind::ParenthesizedExpression, [open_token, expression, closed_token])
     @open_token = open_token
     @expression = expression
     @closed_token = closed_token
-  end
-
-  def get_children
-    if block_given?
-      yield @open_token
-      yield @expression
-      yield @closed_token
-    else
-      [@open_token, @expression, @closed_token]
-    end
   end
 end
