@@ -18,7 +18,7 @@ def pretty_print_tree(root, indent = '', is_last: true)
   indent += is_last ? '    ' : '│   '
   last_child = root.children[-1]
 
-  root.get_children do |child|
+  root.children do |child|
     pretty_print_tree(child, indent, is_last: child == last_child)
   end
 end

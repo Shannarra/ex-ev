@@ -102,7 +102,9 @@ RSpec.describe 'Testing numbers', type: :feature do
           '3*(4**2)+8-((11+4)**2)/3': -19,
           '7*9+3-6/2+2*2-11': 56,
           '11+3-7*2+1*4/2': 2,
-          '12/(1+3)-9*6': -51
+          '12/(1+3)-9*6': -51,
+          # WARNING: This is rounded to the nearest integer, when we support floating-point numbers this next line will break shit:
+          '2+2+2+22+2+2*954-6**7+3/65': -277_998
         }
       end
 

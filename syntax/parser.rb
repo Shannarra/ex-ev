@@ -2,7 +2,19 @@
 
 require_relative 'lexer'
 
+module ParsingHelpers
+  def binary_operator_precedence(kind)
+    case kind
+    when SyntaxKind::StarToken, SyntaxKind::SlashToken, SyntaxKind::DoubleStarToken then 2
+    when SyntaxKind::PlusToken, SyntaxKind::MinusToken then 1
+    else 0
+    end
+  end
+end
+
 class Parser
+  include ParsingHelpers
+
   attr_reader :diagnostics
 
   def initialize(text)
@@ -31,18 +43,21 @@ class Parser
   end
 
   def parse
-    expr = parse_term
+    expr = parse_expression
     eof = match(SyntaxKind::EOFToken)
 
     SyntaxTree.new(@diagnostics, expr, eof)
   end
 
-  def parse_term
+  def parse_expression(parent_precedence = 0)
     left = parse_factor
 
-    while current.kind == SyntaxKind::PlusToken || current.kind == SyntaxKind::MinusToken
+    loop do
+      precedence = binary_operator_precedence(current.kind)
+      break if precedence.zero? || precedence <= parent_precedence
+
       operator = next_token
-      right = parse_factor
+      right = parse_expression(precedence)
       left = BinaryExpressionSyntax.new(left, operator, right)
     end
 
@@ -99,7 +114,7 @@ class Parser
   def parse_primary_expr
     if current.kind == SyntaxKind::OpenParenthesisToken
       left = next_token
-      expr = parse_term
+      expr = parse_expression
       right = match(SyntaxKind::CloseParenthesisToken)
       return ParenthesizedExpressionSyntax.new(left, expr, right)
     end
@@ -113,7 +128,7 @@ class NumberExpressionSyntax < ExpressionSyntax
   attr_reader :kind, :token, :is_integer
 
   def initialize(token)
-    super(kind, [])
+    super(kind, [token])
     @token = token
     @is_integer = token.value.is_a? Integer
   end

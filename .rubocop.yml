@@ -17,3 +17,5 @@ Metrics/BlockLength:
   Max: 100
 Metrics/PerceivedComplexity:
   Max: 50
+Layout/LineLength:
+  Max: 140
