@@ -43,53 +43,73 @@ bundle exec rubocop
 #### 5. Debugging
 When debugging you can print the current AST in a format similar to the linux `tree` command:
 
-For exaple, say that in the command line you've entered the expression: `2+2+2+22+2+2*954-6**7+3/65`
-and are running the REPL using `--showTree`, the output of the expression will be (rounded to the nearest Integer sinse we don't yet fully support floats):
+For exaple, say that in the command line you've entered the expression: `((11*22+33-44)**5)/((6**7)*8+9**9)*(69/420)`
+and are running the REPL using `--showTree`, the output of the expression will be consist of the AST of the given expression and below that, the evaluated result:
 
 ```
-> 2+2+2+22+2+2*954-6**7+3/65
+> ((11*22+33-44)**5)/((6**7)*8+9**9)*(69/420)
 └───BinaryExpression
     ├───BinaryExpression
-    │   ├───BinaryExpression
+    │   ├───ParenthesizedExpression
+    │   │   ├───OpenParenthesisToken
     │   │   ├───BinaryExpression
-    │   │   │   ├───BinaryExpression
+    │   │   │   ├───ParenthesizedExpression
+    │   │   │   │   ├───OpenParenthesisToken
     │   │   │   │   ├───BinaryExpression
     │   │   │   │   │   ├───BinaryExpression
-    │   │   │   │   │   │   ├───
-    │   │   │   │   │   │   │   └───NumberToken 2
+    │   │   │   │   │   │   ├───BinaryExpression
+    │   │   │   │   │   │   │   ├───
+    │   │   │   │   │   │   │   │   └───NumberToken 11
+    │   │   │   │   │   │   │   ├───StarToken
+    │   │   │   │   │   │   │   └───
+    │   │   │   │   │   │   │       └───NumberToken 22
     │   │   │   │   │   │   ├───PlusToken
     │   │   │   │   │   │   └───
-    │   │   │   │   │   │       └───NumberToken 2
-    │   │   │   │   │   ├───PlusToken
+    │   │   │   │   │   │       └───NumberToken 33
+    │   │   │   │   │   ├───MinusToken
     │   │   │   │   │   └───
-    │   │   │   │   │       └───NumberToken 2
-    │   │   │   │   ├───PlusToken
-    │   │   │   │   └───
-    │   │   │   │       └───NumberToken 22
-    │   │   │   ├───PlusToken
+    │   │   │   │   │       └───NumberToken 44
+    │   │   │   │   └───CloseParenthesisToken
+    │   │   │   ├───DoubleStarToken
     │   │   │   └───
-    │   │   │       └───NumberToken 2
-    │   │   ├───PlusToken
-    │   │   └───BinaryExpression
-    │   │       ├───
-    │   │       │   └───NumberToken 2
-    │   │       ├───StarToken
-    │   │       └───
-    │   │           └───NumberToken 954
-    │   ├───MinusToken
-    │   └───BinaryExpression
-    │       ├───
-    │       │   └───NumberToken 6
-    │       ├───DoubleStarToken
-    │       └───
-    │           └───NumberToken 7
-    ├───PlusToken
-    └───BinaryExpression
-        ├───
-        │   └───NumberToken 3
-        ├───SlashToken
-        └───
-            └───NumberToken 65
--277998
+    │   │   │       └───NumberToken 5
+    │   │   └───CloseParenthesisToken
+    │   ├───SlashToken
+    │   └───ParenthesizedExpression
+    │       ├───OpenParenthesisToken
+    │       ├───BinaryExpression
+    │       │   ├───BinaryExpression
+    │       │   │   ├───ParenthesizedExpression
+    │       │   │   │   ├───OpenParenthesisToken
+    │       │   │   │   ├───BinaryExpression
+    │       │   │   │   │   ├───
+    │       │   │   │   │   │   └───NumberToken 6
+    │       │   │   │   │   ├───DoubleStarToken
+    │       │   │   │   │   └───
+    │       │   │   │   │       └───NumberToken 7
+    │       │   │   │   └───CloseParenthesisToken
+    │       │   │   ├───StarToken
+    │       │   │   └───
+    │       │   │       └───NumberToken 8
+    │       │   ├───PlusToken
+    │       │   └───BinaryExpression
+    │       │       ├───
+    │       │       │   └───NumberToken 9
+    │       │       ├───DoubleStarToken
+    │       │       └───
+    │       │           └───NumberToken 9
+    │       └───CloseParenthesisToken
+    ├───StarToken
+    └───ParenthesizedExpression
+        ├───OpenParenthesisToken
+        ├───BinaryExpression
+        │   ├───
+        │   │   └───NumberToken 69
+        │   ├───SlashToken
+        │   └───
+        │       └───NumberToken 420
+        └───CloseParenthesisToken
+
+ 277.3142857142857
 
 ```

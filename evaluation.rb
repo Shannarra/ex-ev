@@ -26,7 +26,11 @@ class Evaluator
       when SyntaxKind::PlusToken then return left + right
       when SyntaxKind::MinusToken then return left - right
       when SyntaxKind::StarToken then return left * right
-      when SyntaxKind::SlashToken then return left / right
+      when SyntaxKind::SlashToken
+        denom = right
+        denom = right.to_f if right > left || right.is_a?(Float)
+
+        return left / denom
       when SyntaxKind::DoubleStarToken then return left**right
       else raise "Unexpected binary operator #{expr.operator.kind}".error!
       end
