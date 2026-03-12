@@ -54,4 +54,23 @@ module Syntax
       @closed_token = closed_token
     end
   end
+
+  class IdentifierExpressionSyntax < ExpressionSyntax
+    attr_reader :id
+
+    def initialize(id)
+      super(SyntaxKind::IdentifierToken, [id])
+      @id = id
+    end
+  end
+
+  class AssignmentExpressionSyntax < ExpressionSyntax
+    attr_reader :id, :value
+
+    def initialize(id, value)
+      super(SyntaxKind::AssignmentToken, [id, value])
+      @id = id
+      @value = value
+    end
+  end
 end

@@ -2,8 +2,9 @@
 
 module Syntax
   class Evaluator
-    def initialize(root)
+    def initialize(root, variables)
       @root = root
+      @variables = variables
     end
 
     def eval!
@@ -17,6 +18,15 @@ module Syntax
         value = expr.token.value
 
         return expr.is_integer ? Integer(value) : Float(value)
+      end
+
+      return @variables[expr.id.value] if expr.is_a? IdentifierExpressionSyntax
+
+      if expr.is_a? AssignmentExpressionSyntax
+        result = evaluate_expr! expr.value
+
+        @variables[expr.id.value] = result
+        return result
       end
 
       if expr.is_a? BinaryExpressionSyntax
@@ -39,7 +49,8 @@ module Syntax
 
       return evaluate_expr! expr.expression if expr.is_a? ParenthesizedExpressionSyntax
 
-      raise "Unexpected node #{expr.kind}".error!
+      binding.pry
+      raise "Unexpected node #{expr.is_a?(Token) ? expr.kind : expr}".error!
     end
   end
 end

@@ -68,7 +68,7 @@ module Syntax
 
     private
 
-    def peek(offset)
+    def peek(offset = 1)
       id = @position + offset
       return tokens[-1] if id >= @tokens.count
 
@@ -117,10 +117,25 @@ module Syntax
         expr = parse_expression
         right = match(SyntaxKind::CloseParenthesisToken)
         return ParenthesizedExpressionSyntax.new(left, expr, right)
+      elsif current.kind == SyntaxKind::IdentifierToken
+        return parse_id
       end
 
       num = match(SyntaxKind::NumberToken)
       NumberExpressionSyntax.new(num)
+    end
+
+    def parse_id
+      id = next_token
+
+      if current.kind == SyntaxKind::AssignmentToken
+        _assignment_op = match(SyntaxKind::AssignmentToken)
+        right = parse_expression # match(SyntaxKind::NumberToken) # parse_expression
+
+        return AssignmentExpressionSyntax.new(id, right)
+      end
+
+      IdentifierExpressionSyntax.new(id)
     end
   end
 end

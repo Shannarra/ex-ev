@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../utils'
-require_relative '../syntax/base'
-require_relative '../syntax/token'
-require_relative '../syntax/evaluation'
-require 'pry'
+require 'spec_helper'
 
 RSpec.describe 'Testing numbers', type: :feature do
   context 'that have been correctly parsed' do
@@ -71,7 +67,7 @@ RSpec.describe 'Testing numbers', type: :feature do
 
   context 'and operations performed on them' do
     before do
-      @eval = ->(root) { Syntax::Evaluator.new(root).eval! }
+      @eval = ->(root) { Syntax::Evaluator.new(root, {}).eval! }
     end
 
     describe 'simple operations are working as expected' do

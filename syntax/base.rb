@@ -19,6 +19,9 @@ module Syntax
     NumberExpression
     BinaryExpression
     ParenthesizedExpression
+
+    AssignmentToken
+    IdentifierToken
   ]
 
   class SyntaxTree

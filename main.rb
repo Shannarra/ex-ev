@@ -24,6 +24,8 @@ def pretty_print_tree(root, indent = '', is_last: true)
 end
 
 def repl_loop(show_tree)
+  variables = {}
+
   loop do
     print '> '
     line = gets.strip
@@ -50,7 +52,7 @@ def repl_loop(show_tree)
         eputs diagnostic
       end
     else
-      evaluator = Syntax::Evaluator.new(tree.root)
+      evaluator = Syntax::Evaluator.new(tree.root, variables)
       res = evaluator.eval!
 
       puts res

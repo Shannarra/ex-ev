@@ -12,7 +12,7 @@ module Syntax
       @position = 0
     end
 
-    def lex!
+    def lex! # rubocop:disable Metrics/MethodLength
       return Token.new(SyntaxKind::EOFToken, @position, '\0', nil) if @position >= @text.length
 
       if current.numeric?
@@ -48,20 +48,32 @@ module Syntax
         return Token.new(SyntaxKind::WhitespaceToken, start, text, nil)
       end
 
-      case current
-      when '+'
-        return Token.new(SyntaxKind::PlusToken, @position += 1, current, nil)
-      when '-'
-        return Token.new(SyntaxKind::MinusToken, @position += 1, current, nil)
-      when '*'
-        return Token.new(SyntaxKind::StarToken, @position += 1, current, nil)
-      when '/'
-        return Token.new(SyntaxKind::SlashToken, @position += 1, current, nil)
-      when '('
-        return Token.new(SyntaxKind::OpenParenthesisToken, @position += 1, current, nil)
-      when ')'
-        return Token.new(SyntaxKind::CloseParenthesisToken, @position += 1, current, nil)
-      end
+      type = case current
+             when '+'
+               SyntaxKind::PlusToken
+             when '-'
+               SyntaxKind::MinusToken
+             when '*'
+               SyntaxKind::StarToken
+             when '/'
+               SyntaxKind::SlashToken
+             when '('
+               SyntaxKind::OpenParenthesisToken
+             when ')'
+               SyntaxKind::CloseParenthesisToken
+             when '='
+               SyntaxKind::AssignmentToken
+             else
+               token = ''
+               until [' ', '=', '\0'].include?(current)
+                 token += current
+                 get_next
+               end
+
+               return Token.new(SyntaxKind::IdentifierToken, @position, token, token)
+             end
+
+      return Token.new(type, @position += 1, current, nil) if type
 
       @diagnostics << "Bad character input: '#{current}'"
       Token.new(SyntaxKind::BadToken, @position += 1, @text[@position - 1], nil)
