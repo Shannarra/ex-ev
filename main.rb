@@ -4,15 +4,15 @@
 require 'pry'
 
 require_relative 'utils'
-require_relative 'syntax'
-require_relative 'evaluation'
+require_relative 'syntax/base'
+require_relative 'syntax/evaluation'
 
 def pretty_print_tree(root, indent = '', is_last: true)
   marker = is_last ? '└───' : '├───'
 
   print "#{indent}#{marker}#{root.kind}"
 
-  print " #{root.value}" if root.is_a?(Token) && !root.value.nil?
+  print " #{root.value}" if root.is_a?(Syntax::Token) && !root.value.nil?
   puts ''
 
   indent += is_last ? '    ' : '│   '
@@ -35,22 +35,22 @@ def repl_loop(show_tree)
       next
     when '#printTree', '#print', '#p'
       show_tree = !show_tree
-      puts "#{show_tree ? '' : 'Not '}Showing Tree"
+      puts "#{(!show_tree && 'Not ') || ''}Showing Tree"
       next
     when '#exit', '#e', '#quit', '#q'
       return
     end
 
-    tree = SyntaxTree.parse(line)
+    tree = Syntax::SyntaxTree.parse(line)
 
     pretty_print_tree(tree.root) if show_tree
 
-    if tree.diagnostics.flatten.count.positive?
+    if tree.diagnostics.flatten.any?
       tree.diagnostics.each do |diagnostic|
         eputs diagnostic
       end
     else
-      evaluator = Evaluator.new(tree.root)
+      evaluator = Syntax::Evaluator.new(tree.root)
       res = evaluator.eval!
 
       puts res

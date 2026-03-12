@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 require_relative '../utils'
-require_relative '../syntax'
-require_relative '../evaluation'
+require_relative '../syntax/base'
+require_relative '../syntax/token'
+require_relative '../syntax/evaluation'
 require 'pry'
 
 RSpec.describe 'Testing numbers', type: :feature do
@@ -10,14 +11,14 @@ RSpec.describe 'Testing numbers', type: :feature do
     before do
       @float_test_value = 69.69
       @int_test_value = 69
-      @float_parser = Parser.new(@float_test_value.to_s)
-      @int_parser = Parser.new(@int_test_value.to_s)
+      @float_parser = Syntax::Parser.new(@float_test_value.to_s)
+      @int_parser = Syntax::Parser.new(@int_test_value.to_s)
     end
 
     describe 'by constructing correct parsers' do
       it 'for integers and floats' do
-        expect(@int_parser.class).to eq Parser
-        expect(@float_parser.class).to eq Parser
+        expect(@int_parser.class).to eq Syntax::Parser
+        expect(@float_parser.class).to eq Syntax::Parser
       end
     end
 
@@ -28,8 +29,8 @@ RSpec.describe 'Testing numbers', type: :feature do
       end
 
       it 'by constructing valid trees' do
-        expect(@int_tree.class).to be SyntaxTree
-        expect(@float_tree.class).to be SyntaxTree
+        expect(@int_tree.class).to be Syntax::SyntaxTree
+        expect(@float_tree.class).to be Syntax::SyntaxTree
       end
 
       it 'by having no errors or diagnostics' do
@@ -44,16 +45,16 @@ RSpec.describe 'Testing numbers', type: :feature do
         end
 
         it 'have correct types for integers' do
-          expect(@int_root.is_a?(ExpressionSyntax)).to be true
-          expect(@int_root.is_a?(NumberExpressionSyntax)).to be true
-          expect(@int_root.token.kind).to eq SyntaxKind::NumberToken
+          expect(@int_root.is_a?(Syntax::ExpressionSyntax)).to be true
+          expect(@int_root.is_a?(Syntax::NumberExpressionSyntax)).to be true
+          expect(@int_root.token.kind).to eq Syntax::SyntaxKind::NumberToken
           expect(@int_root.is_integer).to be true
         end
 
         it 'have correct types for floats' do
-          expect(@float_root.is_a?(ExpressionSyntax)).to be true
-          expect(@float_root.is_a?(NumberExpressionSyntax)).to be true
-          expect(@float_root.token.kind).to eq SyntaxKind::NumberToken
+          expect(@float_root.is_a?(Syntax::ExpressionSyntax)).to be true
+          expect(@float_root.is_a?(Syntax::NumberExpressionSyntax)).to be true
+          expect(@float_root.token.kind).to eq Syntax::SyntaxKind::NumberToken
           expect(@float_root.is_integer).to be false
         end
 
@@ -70,7 +71,7 @@ RSpec.describe 'Testing numbers', type: :feature do
 
   context 'and operations performed on them' do
     before do
-      @eval = ->(root) { Evaluator.new(root).eval! }
+      @eval = ->(root) { Syntax::Evaluator.new(root).eval! }
     end
 
     describe 'simple operations are working as expected' do
@@ -78,7 +79,7 @@ RSpec.describe 'Testing numbers', type: :feature do
         @range = (1.0..10_000_000.0)
         @num1 = rand(@range)
         @num2 = rand(@range)
-        @operation = ->(operator) { SyntaxTree.parse("#{@num1} #{operator} #{@num2}").root }
+        @operation = ->(operator) { Syntax::SyntaxTree.parse("#{@num1} #{operator} #{@num2}").root }
       end
 
       it 'adds correctly' do
@@ -110,7 +111,7 @@ RSpec.describe 'Testing numbers', type: :feature do
 
       it 'evaluates harder examples correctly' do
         @expressions.each do |text, value|
-          result_tree = SyntaxTree.parse(text)
+          result_tree = Syntax::SyntaxTree.parse(text)
           throw result_tree.diagnostics.join unless result_tree.diagnostics.empty? # prevent unexpected characters
 
           expect(@eval.call(result_tree.root)).to be value

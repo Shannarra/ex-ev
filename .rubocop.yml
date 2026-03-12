@@ -6,6 +6,9 @@ Style/Documentation:
   Enabled: false
 Style/Encoding:
   Enabled: false
+Style/OneClassPerFile:
+  Enabled: false
+
 
 Metrics/AbcSize:
   Max: 100
