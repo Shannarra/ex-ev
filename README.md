@@ -1,6 +1,29 @@
 # EX-EV
 A fully functional expression evaluator writtien in Ruby.
 
+
+### Examples
+You can run the program to evaluate a single expression:
+```console
+ruby main.rb
+> ((11*22+33-44)**5)/((6**7)*8+9**9)*(69/420)
+277.3142857142857
+```
+
+Or you can use variables:
+```console
+ruby main.rb
+
+> first_part = 34
+34
+> second_part = 35
+35
+> best_number_ever = first_part + second_part
+69
+```
+
+Variable assignment is expression evaluation in itself, meaning that variables can use or _create_ other variables during evaluation.
+
 ### Usage
 #### 1. Prerequisites
 - Ruby, 3.0 and later, older versions might work.
