@@ -87,6 +87,7 @@ module Syntax
 
     def match(kind)
       return next_token if current.kind == kind
+      return next_token if [SyntaxKind::NewlineToken, SyntaxKind::TabToken].include? current.kind
 
       diagnostics << "Unexpected token <#{current.kind}>. Expected <#{kind}>"
       Token.new(kind, current.position, nil, nil)
@@ -117,9 +118,9 @@ module Syntax
         expr = parse_expression
         right = match(SyntaxKind::CloseParenthesisToken)
         return ParenthesizedExpressionSyntax.new(left, expr, right)
-      elsif current.kind == SyntaxKind::IdentifierToken
-        return parse_id
       end
+
+      return parse_id if current.kind == SyntaxKind::IdentifierToken
 
       num = match(SyntaxKind::NumberToken)
       NumberExpressionSyntax.new(num)

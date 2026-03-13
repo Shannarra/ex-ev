@@ -12,41 +12,12 @@ module Syntax
       @position = 0
     end
 
-    def lex! # rubocop:disable Metrics/MethodLength
+    def lex!
       return Token.new(SyntaxKind::EOFToken, @position, '\0', nil) if @position >= @text.length
 
-      if current.numeric?
-        start = @position
+      return handle_numeric if current.numeric?
 
-        get_next while current.numeric?
-
-        text = @text[start...@position]
-        num = nil
-
-        begin
-          num = if current == '.'
-                  get_next
-                  get_next while current.numeric?
-
-                  text = @text[start...@position]
-                  Float(text)
-                else
-                  Integer(text)
-                end
-        rescue ArgumentError
-          @diagnostics << "[ERROR] \"#{text}\" is not a valid number!"
-        end
-
-        return Token.new(SyntaxKind::NumberToken, start, text, num)
-      end
-
-      if current == ' '
-        start = @position
-        get_next while current == ' '
-
-        text = @text[start...@position]
-        return Token.new(SyntaxKind::WhitespaceToken, start, text, nil)
-      end
+      return handle_whitetext if [' ', "\n", "\t"].include? current
 
       type = case current
              when '+'
@@ -80,6 +51,58 @@ module Syntax
     end
 
     private
+
+    def handle_numeric
+      start = @position
+
+      get_next while current.numeric?
+
+      text = @text[start...@position]
+      num = nil
+
+      begin
+        num = if current == '.'
+                get_next
+                get_next while current.numeric?
+
+                text = @text[start...@position]
+                Float(text)
+              else
+                Integer(text)
+              end
+      rescue ArgumentError
+        @diagnostics << "[ERROR] \"#{text}\" is not a valid number!"
+      end
+
+      Token.new(SyntaxKind::NumberToken, start, text, num)
+    end
+
+    def handle_whitetext
+      case current
+      when ' '
+        start = @position
+        get_next while current == ' '
+
+        text = @text[start...@position]
+        Token.new(SyntaxKind::WhitespaceToken, start, text, nil)
+      when "\n"
+        initial = current
+        start = @position
+
+        get_next while current == initial
+        text = @text[start..@position]
+        Token.new(SyntaxKind::NewlineToken, start, text, nil)
+      when "\t"
+        initial = current
+        start = @position
+
+        get_next while current == initial
+        text = @text[start..@position]
+        Token.new(SyntaxKind::TabToken, start, text, nil)
+      else
+        raise "Unhandled whitespace character #{current}".error!
+      end
+    end
 
     def current
       return '\0' if @position >= @text.length

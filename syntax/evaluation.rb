@@ -20,7 +20,14 @@ module Syntax
         return expr.is_integer ? Integer(value) : Float(value)
       end
 
-      return @variables[expr.id.value] if expr.is_a? IdentifierExpressionSyntax
+      if expr.is_a? IdentifierExpressionSyntax
+        unless @variables.keys.include? expr.id.value
+          eputs "Unknown variable \"#{expr.id.value}\" at #{expr.id.position}"
+          return
+        end
+
+        return @variables[expr.id.value]
+      end
 
       if expr.is_a? AssignmentExpressionSyntax
         result = evaluate_expr! expr.value
@@ -49,7 +56,6 @@ module Syntax
 
       return evaluate_expr! expr.expression if expr.is_a? ParenthesizedExpressionSyntax
 
-      binding.pry
       raise "Unexpected node #{expr.is_a?(Token) ? expr.kind : expr}".error!
     end
   end

@@ -20,6 +20,9 @@ module Syntax
     BinaryExpression
     ParenthesizedExpression
 
+    NewlineToken
+    TabToken
+
     AssignmentToken
     IdentifierToken
   ]
